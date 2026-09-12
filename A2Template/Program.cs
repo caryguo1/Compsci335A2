@@ -4,6 +4,7 @@ using A2Template.Data;
 using A2Template.Handler;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
+using WebAPIvCard.Helper;
 
 
 public class Program
@@ -40,6 +41,8 @@ public class Program
             options.AddPolicy("UserOnly", policy => policy.RequireClaim(ClaimTypes.Role, "user"));
             options.AddPolicy("UserOrOrganizer", policy => policy.RequireRole("user", "organizer"));
         });
+
+        builder.Services.AddMvc(options => options.OutputFormatters.Add(new CalendarOutputFormatter()));
 
         var app = builder.Build();
 

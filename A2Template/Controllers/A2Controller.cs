@@ -127,7 +127,8 @@ namespace A2Template.Controllers
             if (retrivedEvent != null)
             {
                 // do stuff
-                return Ok();
+                Response.Headers.Add("Content-Type", "text/calendar");
+                return Ok(retrivedEvent);
             } 
             else
             {
