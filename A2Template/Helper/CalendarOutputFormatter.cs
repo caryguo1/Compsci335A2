@@ -18,6 +18,8 @@ namespace WebAPIvCard.Helper
         }
 
         // Helper function for ensuring that special characters work properly.
+        
+        /*
         private string EscapeText(string text)
         {
             return text
@@ -26,8 +28,10 @@ namespace WebAPIvCard.Helper
                 .Replace(",", "\\,")
                 .Replace("\r\n", "\\n")
                 .Replace("\n", "\\n")
-                .Replace("\r", "\\n");
+                .Replace("\r", "\\r");
         }
+        */
+        
 
         public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
         {
@@ -45,9 +49,11 @@ namespace WebAPIvCard.Helper
             builder.Append("DTSTAMP:").Append(DateTime.UtcNow.ToString("yyyyMMdd'T'HHmmss'Z'")).Append(CRLF);
             builder.Append("DTSTART:").Append(retrievedEvent.Start).Append(CRLF);
             builder.Append("DTEND:").Append(retrievedEvent.End).Append(CRLF);
-            builder.Append("SUMMARY:").Append(EscapeText(retrievedEvent.Summary)).Append(CRLF);
-            builder.Append("DESCRIPTION:").Append(EscapeText(retrievedEvent.Description)).Append(CRLF);
-            builder.Append("LOCATION:").Append(EscapeText(retrievedEvent.Location)).Append(CRLF);
+
+            // Is the 75 character limit relevant here?
+            builder.Append("SUMMARY:").Append(retrievedEvent.Summary).Append(CRLF);
+            builder.Append("DESCRIPTION:").Append(retrievedEvent.Description).Append(CRLF);
+            builder.Append("LOCATION:").Append(retrievedEvent.Location).Append(CRLF);
 
             builder.Append("END:VEVENT").Append(CRLF);
             builder.Append("END:VCALENDAR").Append(CRLF);

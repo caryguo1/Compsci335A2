@@ -43,7 +43,7 @@ namespace A2Template.Controllers
         [Authorize(AuthenticationSchemes = "Authentication")]
         [Authorize(Policy = "UserOnly")]
         [HttpGet("PurchaseSign/{id}")]
-        public ActionResult PurchaseSign(string id)
+        public ActionResult<PurchaseOutput> PurchaseSign(string id)
         {
             Sign sign = _repository.GetSign(id);
             if (sign != null)
@@ -60,40 +60,30 @@ namespace A2Template.Controllers
         [Authorize(AuthenticationSchemes = "Authentication")]
         [Authorize(Policy = "OrganizerOnly")]
         [HttpPost("AddEvent")]
-        public ActionResult AddEvent(EventInput inputEvent)
+        public ActionResult<string> AddEvent(EventInput inputEvent)
         {
-            if (!DateTime.TryParseExact(
-                inputEvent.Start,
-                "yyyyMMdd'T'HHmmss'Z'",
-                null,
-                DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
-                out _)
-                &&
-                !DateTime.TryParseExact(
-                inputEvent.End,
-                "yyyyMMdd'T'HHmmss'Z'",
-                null,
-                DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
-                out _)
-                )
+            bool validStart = DateTime.TryParseExact(
+                                inputEvent.Start,
+                                "yyyyMMdd'T'HHmmss'Z'",
+                                null,
+                                DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
+                                out _);
+                                
+            bool validEnd = DateTime.TryParseExact(
+                                inputEvent.End,
+                                "yyyyMMdd'T'HHmmss'Z'",
+                                null,
+                                DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
+                                out _);
+            if (!validStart && !validEnd)
             {
                 return BadRequest("The format of Start and End should be yyyyMMddTHHmmssZ.");
             }
-            else if (!DateTime.TryParseExact(
-                inputEvent.Start,
-                "yyyyMMdd'T'HHmmss'Z'",
-                null,
-                DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
-                out _))
+            else if (!validStart)
             {
                 return BadRequest("The format of Start should be yyyyMMddTHHmmssZ.");
             }
-            else if (!DateTime.TryParseExact(
-                inputEvent.End,
-                "yyyyMMdd'T'HHmmss'Z'",
-                null,
-                DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
-                out _))
+            else if (!validEnd)
             {
                 return BadRequest("The format of End should be yyyyMMddTHHmmssZ.");
             }
@@ -105,7 +95,20 @@ namespace A2Template.Controllers
                     Summary = inputEvent.Summary,
                     Description = inputEvent.Description,
                     Location = inputEvent.Location};
+
+                Console.WriteLine(
+                    inputEvent.Description
+                        .Replace("\r", "[CR]")
+                        .Replace("\n", "[LF]")
+                );
+
                 _repository.AddEvent(userInputEvent);
+
+                Console.WriteLine(
+                    inputEvent.Description
+                        .Replace("\r", "[CR]")
+                        .Replace("\n", "[LF]")
+                );
                 return Ok("Success");
             }
         }
@@ -113,7 +116,7 @@ namespace A2Template.Controllers
         [Authorize(AuthenticationSchemes = "Authentication")]
         [Authorize(Policy = "UserOrOrganizer")]
         [HttpGet("EventCount")]
-        public ActionResult EventCount()
+        public ActionResult<int> EventCount()
         {
             return Ok(_repository.GetEventCount());
         }

@@ -9,7 +9,9 @@ namespace A2Template.Models
     public class Organizer
     {
         [Key]
+        [Required]
         public string Name { get; set; }
+        [Required]
         public string Password { get; set; }
     }
 }
